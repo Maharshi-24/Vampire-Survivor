@@ -7,3 +7,4 @@ class AllSprites(pygame.sprite.Group):
     def draw(self, surface):
         for sprite in self:
             surface.blit(sprite.image, sprite.rect)
+            
