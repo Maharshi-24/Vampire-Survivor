@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         # Load player image
         self.image = pygame.image.load(join('..', 'images', 'player', 'down', '0.png')).convert_alpha()
         self.rect = self.image.get_rect(center=pos)  # Full sprite rectangle
-        self.hitbox_rect = self.rect.inflate(-60, -5)  # Create a smaller hitbox inside the rect
+        self.hitbox_rect = self.rect.inflate(-60, -90)  # Create a smaller hitbox inside the rect
 
         # Movement attributes
         self.direction = pygame.math.Vector2()  # Initialize direction
