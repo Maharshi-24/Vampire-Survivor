@@ -46,3 +46,4 @@ class Player(pygame.sprite.Sprite):
         # Update player state
         self.input()
         self.move(dt)
+        
