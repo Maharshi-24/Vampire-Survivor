@@ -4,7 +4,9 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         # Load player image
-        self.image = pygame.image.load(join('..', 'images', 'player', 'down', '0.png')).convert_alpha()
+        self.load_images()
+        self.state, self.frame_index = 'down', 0
+        self.image = self.frames[self.state][self.frame_index]  # Set initial image
         self.rect = self.image.get_rect(center=pos)  # Full sprite rectangle
         self.hitbox_rect = self.rect.inflate(-60, -90)  # Create a smaller hitbox inside the rect
 
@@ -12,6 +14,18 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2()  # Initialize direction
         self.speed = 500  # Set speed
         self.collision_sprites = collision_sprites
+
+    def load_images(self):
+        # Load player images
+        self.frames = {'up': [], 'down': [], 'left': [], 'right': []}
+
+        for state in self.frames.keys():
+            for folder_path, sub_folders, file_names in walk(join('..', 'images', 'player', state)):
+                if file_names:
+                    for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
+                        full_path = join(folder_path, file_name)
+                        surf = pygame.image.load(full_path).convert_alpha()
+                        self.frames[state].append(surf)
 
     def input(self):
         # Handle player input (e.g., keyboard)
@@ -42,8 +56,22 @@ class Player(pygame.sprite.Sprite):
                     if self.direction.y < 0:  # Moving up
                         self.hitbox_rect.top = sprite.rect.bottom
 
+    def animate(self, dt):
+        # Get state based on direction
+        if self.direction.x != 0:
+            self.state = 'right' if self.direction.x > 0 else 'left'
+        elif self.direction.y != 0:
+            self.state = 'down' if self.direction.y > 0 else 'up'
+
+        # Animate
+        if self.direction.magnitude() != 0:  # Only animate if the player is moving
+            self.frame_index += 5 * dt  # Increment frame index
+            if self.frame_index >= len(self.frames[self.state]):  # Loop animation
+                self.frame_index = 0
+            self.image = self.frames[self.state][int(self.frame_index)]  # Update image
+
     def update(self, dt):
         # Update player state
         self.input()
         self.move(dt)
-        
+        self.animate(dt)
