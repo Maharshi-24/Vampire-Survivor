@@ -18,12 +18,17 @@ class Gun(pygame.sprite.Sprite):
     def __init__(self, player, groups):
         # Player connection
         self.player = player
-        self.distance = 140  # Distance from the player
+        self.distance = 100  # Distance from the player
         self.player_direction = pygame.math.Vector2(0, 1)
 
         # Sprite setup
         super().__init__(groups)
         self.gun_surf = pygame.image.load(join('..', 'images', "gun", 'gun.png')).convert_alpha()
+
+        # Scale down the gun image 
+        scale_factor = 0.7  # Adjust this value to make the gun smaller or larger
+        self.gun_surf = pygame.transform.scale(self.gun_surf, (int(self.gun_surf.get_width() * scale_factor), int(self.gun_surf.get_height() * scale_factor)))
+
         self.image = self.gun_surf
         self.rect = self.image.get_rect(center=self.player.rect.center + self.player_direction * self.distance)
 

@@ -36,7 +36,7 @@ class Game:
             direction = pygame.Vector2(mouse_pos[0] - WINDOW_WIDTH / 2, mouse_pos[1] - WINDOW_HEIGHT / 2).normalize()
             
             # Calculate the bullet's starting position at the tip of the gun
-            gun_tip_offset = 60  # Adjust this value based on the gun's length
+            gun_tip_offset = 40  # Adjust this value based on the gun's length
             bullet_start_pos = self.gun.rect.center + direction * gun_tip_offset
             
             # Spawn the bullet at the tip of the gun with the calculated direction
@@ -46,6 +46,9 @@ class Game:
 
     def load_images(self):
         self.bullet_surf = pygame.image.load(join('..', 'images', 'gun', 'bullet.png')).convert_alpha()
+         # Scale down the bullet image 
+        scale_factor = 0.6  # Adjust this value to make the bullet smaller or larger
+        self.bullet_surf = pygame.transform.scale(self.bullet_surf, (int(self.bullet_surf.get_width() * scale_factor), int(self.bullet_surf.get_height() * scale_factor)))
 
     def gun_timer(self):
         if not self.can_shoot:
