@@ -1,9 +1,12 @@
 from settings import *
+import pygame
+from os.path import join
+from os import walk
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
-        # Load player image
+        # Load player images
         self.load_images()
         self.state, self.frame_index = 'down', 0
         self.image = self.frames[self.state][self.frame_index]  # Set initial image
@@ -12,8 +15,14 @@ class Player(pygame.sprite.Sprite):
 
         # Movement attributes
         self.direction = pygame.math.Vector2()  # Initialize direction
-        self.speed = 500  # Set speed
+        self.speed = PLAYER_SPEED  # Set speed
         self.collision_sprites = collision_sprites
+
+        # Invincibility and blinking
+        self.iframes_active = False  # Track if i-frames are active
+        self.iframe_timer = 0  # Timer for i-frames
+        self.blink_timer = 0  # Timer for blinking
+        self.visible = True  # Track visibility for blinking
 
     def load_images(self):
         # Load player images
@@ -70,8 +79,37 @@ class Player(pygame.sprite.Sprite):
                 self.frame_index = 0
             self.image = self.frames[self.state][int(self.frame_index)]  # Update image
 
+    def take_damage(self):
+        if not self.iframes_active:  # Only take damage if not in i-frames
+            self.iframes_active = True
+            self.iframe_timer = pygame.time.get_ticks()  # Start i-frame timer
+            self.blink_timer = pygame.time.get_ticks()  # Start blink timer
+            self.visible = True  # Reset visibility
+            return True  # Return True to indicate damage was taken
+        return False  # Return False if no damage was taken
+
+    def update_iframes(self):
+        if self.iframes_active:
+            current_time = pygame.time.get_ticks()
+            # Check if i-frames are over
+            if current_time - self.iframe_timer >= IFRAME_DURATION:
+                self.iframes_active = False
+                self.visible = True  # Ensure player is visible after i-frames
+            else:
+                # Handle blinking
+                if current_time - self.blink_timer >= BLINK_INTERVAL:
+                    self.visible = not self.visible  # Toggle visibility
+                    self.blink_timer = current_time  # Reset blink timer
+
     def update(self, dt):
         # Update player state
         self.input()
         self.move(dt)
         self.animate(dt)
+        self.update_iframes()  # Update i-frames and blinking
+
+        # Only draw the player if visible
+        if self.visible:
+            self.image = self.frames[self.state][int(self.frame_index)]
+        else:
+            self.image = pygame.Surface((0, 0), pygame.SRCALPHA)  # Invisible

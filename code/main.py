@@ -5,8 +5,8 @@ from player import Player
 from sprites import *
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-
 from random import randint, choice
+import math
 
 class Game:
     def __init__(self):
@@ -23,50 +23,38 @@ class Game:
         self.bullet_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
 
-        #gun timer
+        # Gun timer
         self.can_shoot = True
         self.shoot_time = 0
-        self.gun_cool_down = 500
+        self.gun_cool_down = 100
 
-        #enemy timer
+        # Enemy timer
         self.enemy_event = pygame.event.custom_type()
         pygame.time.set_timer(self.enemy_event, 300)
         self.spawn_positions = []
-        
-        #audio
+
+        # Player health
+        self.player_health = MAX_HEALTH
+        self.health_bar_shake_timer = 0
+        self.damage_flash_timer = 0
+        self.low_health_pulse_alpha = 0
+
+        # Audio
         self.shoot_sound = pygame.mixer.Sound(join('..', 'audio', 'shoot.wav'))
         self.shoot_sound.set_volume(0.4)
         self.impact_sound = pygame.mixer.Sound(join('..', 'audio', 'impact.ogg'))
-        self.impact_sound.set_volume(0.1)
         self.music = pygame.mixer.Sound(join('..', 'audio', 'music.wav'))
-        self.music.set_volume(0.1)
-        self.music.play(-1)
+        # self.music.set_volume(0.3)
+        # self.music.play(-1)
 
-        #setup 
+        # Setup
         self.load_images()
-        self.setup()    
-
-    def input(self):
-        if pygame.mouse.get_pressed()[0] and self.can_shoot:
-            self.shoot_sound.play()
-            # Get the mouse position
-            mouse_pos = pygame.mouse.get_pos()
-            # Calculate the direction vector from the gun to the mouse
-            direction = pygame.Vector2(mouse_pos[0] - WINDOW_WIDTH / 2, mouse_pos[1] - WINDOW_HEIGHT / 2).normalize()
-            
-            # Calculate the bullet's starting position at the tip of the gun
-            gun_tip_offset = 40  # Adjust this value based on the gun's length
-            bullet_start_pos = self.gun.rect.center + direction * gun_tip_offset
-            
-            # Spawn the bullet at the tip of the gun with the calculated direction
-            Bullet(self.bullet_surf, bullet_start_pos, direction, [self.all_sprites, self.bullet_sprites])
-            self.can_shoot = False
-            self.shoot_time = pygame.time.get_ticks()
+        self.setup()
 
     def load_images(self):
+        # Load bullet image
         self.bullet_surf = pygame.image.load(join('..', 'images', 'gun', 'bullet.png')).convert_alpha()
-        # Scale down the bullet image 
-        scale_factor = 0.6  # Adjust this value to make the bullet smaller or larger
+        scale_factor = 0.6
         self.bullet_surf = pygame.transform.scale(self.bullet_surf, (int(self.bullet_surf.get_width() * scale_factor), int(self.bullet_surf.get_height() * scale_factor)))
 
         # Load enemy frames
@@ -84,17 +72,6 @@ class Game:
                     surf = pygame.image.load(full_path).convert_alpha()
                     self.enemy_frames[enemy_type].append(surf)
 
-        # Debug print to check loaded enemy frames
-        print("Loaded enemy frames:", self.enemy_frames)
-        
-
-
-    def gun_timer(self):
-        if not self.can_shoot:
-            current_time = pygame.time.get_ticks()
-            if current_time - self.shoot_time >= self.gun_cool_down:
-                self.can_shoot = True
-
     def setup(self):
         map = load_pygame(join('..', 'data', 'maps', 'world.tmx'))
 
@@ -110,9 +87,32 @@ class Game:
         for obj in map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
-                self.gun = Gun(self.player, self.all_sprites) 
+                self.gun = Gun(self.player, self.all_sprites)
             else:
                 self.spawn_positions.append((obj.x, obj.y))
+
+    def input(self):
+        if pygame.mouse.get_pressed()[0] and self.can_shoot:
+            self.shoot_sound.play()
+            # Get the mouse position
+            mouse_pos = pygame.mouse.get_pos()
+            # Calculate the direction vector from the gun to the mouse
+            direction = pygame.Vector2(mouse_pos[0] - WINDOW_WIDTH / 2, mouse_pos[1] - WINDOW_HEIGHT / 2).normalize()
+
+            # Calculate the bullet's starting position at the tip of the gun
+            gun_tip_offset = 40  # Adjust this value based on the gun's length
+            bullet_start_pos = self.gun.rect.center + direction * gun_tip_offset
+
+            # Spawn the bullet at the tip of the gun with the calculated direction
+            Bullet(self.bullet_surf, bullet_start_pos, direction, [self.all_sprites, self.bullet_sprites])
+            self.can_shoot = False
+            self.shoot_time = pygame.time.get_ticks()
+
+    def gun_timer(self):
+        if not self.can_shoot:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.shoot_time >= self.gun_cool_down:
+                self.can_shoot = True
 
     def bullet_collision(self):
         if self.bullet_sprites:
@@ -126,45 +126,86 @@ class Game:
                             sprite.destroy()
                     bullet.kill()
 
-            # Check collision with enemy sprites
-            enemy_collisions = pygame.sprite.spritecollide(bullet, self.enemy_sprites, False, pygame.sprite.collide_mask)
-            if enemy_collisions:
-                self.impact_sound.play()
-                for enemy in enemy_collisions:
-                    if hasattr(enemy, 'destroy'):  # Check if the enemy has a destroy method
-                        enemy.destroy()
-                bullet.kill()
+                # Check collision with enemy sprites
+                enemy_collisions = pygame.sprite.spritecollide(bullet, self.enemy_sprites, False, pygame.sprite.collide_mask)
+                if enemy_collisions:
+                    self.impact_sound.play()
+                    for enemy in enemy_collisions:
+                        if hasattr(enemy, 'destroy'):  # Check if the enemy has a destroy method
+                            enemy.destroy()
+                    bullet.kill()
 
     def player_collision(self):
         if pygame.sprite.spritecollide(self.player, self.enemy_sprites, False, pygame.sprite.collide_mask):
-            self.running = False
+            if self.player.take_damage():  # If damage is taken
+                self.take_damage()  # Reduce health
+
+    def draw_health_bar(self):
+        # Calculate health bar width based on current health
+        health_width = (self.player_health / MAX_HEALTH) * HEALTH_BAR_WIDTH
+
+        # Draw health bar background
+        pygame.draw.rect(self.display_surface, HEALTH_BAR_BG_COLOR, (*HEALTH_BAR_POS, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT))
+
+        # Draw health bar foreground (current health) with gradient
+        health_surface = pygame.Surface((health_width, HEALTH_BAR_HEIGHT))
+        health_surface.fill(HEALTH_BAR_COLOR)
+        self.display_surface.blit(health_surface, HEALTH_BAR_POS)
+
+        # Draw health bar border
+        border_rect = pygame.Rect(*HEALTH_BAR_POS, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT)
+        pygame.draw.rect(self.display_surface, HEALTH_BAR_BORDER_COLOR, border_rect, HEALTH_BAR_BORDER_WIDTH)
+
+        # Shake effect when hit
+        if self.health_bar_shake_timer > 0:
+            shake_offset = randint(-5, 5)
+            self.display_surface.blit(self.display_surface, (shake_offset, 0))
+            self.health_bar_shake_timer -= 1
+
+        # Low health pulse effect
+        if self.player_health <= LOW_HEALTH_THRESHOLD:
+            self.low_health_pulse_alpha += LOW_HEALTH_PULSE_SPEED
+            pulse_alpha = int((1 + math.sin(self.low_health_pulse_alpha)) * 127.5 + 127.5)
+            pulse_surface = pygame.Surface((HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT), pygame.SRCALPHA)
+            pulse_surface.fill((255, 0, 0, pulse_alpha))
+            self.display_surface.blit(pulse_surface, HEALTH_BAR_POS)
+
+    def take_damage(self):
+        if self.player_health > 0:
+            self.player_health -= 1  # Reduce health by 1 hit
+            self.health_bar_shake_timer = HEALTH_BAR_SHAKE_DURATION  # Start shake effect
+            self.damage_flash_timer = DAMAGE_FLASH_DURATION  # Start damage flash effect
+
+            # Check if player is dead
+            if self.player_health <= 0:
+                self.running = False  # End the game
 
     def run(self):
-        #dt
         while self.running:
             dt = self.clock.tick(60) / 1000
 
-            #event loop
+            # Event loop
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == self.enemy_event:
                     Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites),
 
-            #update
+            # Update
             self.gun_timer()
             self.input()
             self.all_sprites.update(dt)
             self.bullet_collision()
             self.player_collision()
 
-            #draw
+            # Draw
             self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
+            self.draw_health_bar()  # Draw the health bar
             pygame.display.update()
 
         pygame.quit()
 
 if __name__ == '__main__':
     game = Game()
-    game.run()  
+    game.run()
