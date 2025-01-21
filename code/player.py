@@ -29,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.frames = {'up': [], 'down': [], 'left': [], 'right': []}
 
         for state in self.frames.keys():
-            for folder_path, sub_folders, file_names in walk(join('..', 'images', 'player', state)):
+            for folder_path, sub_folders, file_names in walk(IMAGE_PATHS['player'][state]):
                 if file_names:
                     for file_name in sorted(file_names, key=lambda name: int(name.split('.')[0])):
                         full_path = join(folder_path, file_name)

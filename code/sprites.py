@@ -13,7 +13,7 @@ class CollisionSprite(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_rect(topleft=pos)
-        
+
 class Gun(pygame.sprite.Sprite):
     def __init__(self, player, groups):
         # Player connection
@@ -23,9 +23,9 @@ class Gun(pygame.sprite.Sprite):
 
         # Sprite setup
         super().__init__(groups)
-        self.gun_surf = pygame.image.load(join('..', 'images', "gun", 'gun.png')).convert_alpha()
+        self.gun_surf = pygame.image.load(IMAGE_PATHS['gun']).convert_alpha()
 
-        # Scale down the gun image 
+        # Scale down the gun image
         scale_factor = 0.7  # Adjust this value to make the gun smaller or larger
         self.gun_surf = pygame.transform.scale(self.gun_surf, (int(self.gun_surf.get_width() * scale_factor), int(self.gun_surf.get_height() * scale_factor)))
 
@@ -56,10 +56,10 @@ class Bullet(pygame.sprite.Sprite):
         self.image = surf
         self.rect = self.image.get_rect(center=pos)
         self.spawn_time = pygame.time.get_ticks()
-        self.lifetime = 1000
+        self.lifetime = BULLET_LIFETIME
         
         self.direction = direction  # Use the direction passed from the input method
-        self.speed = 1200
+        self.speed = BULLET_SPEED
 
     def update(self, dt):
         self.rect.x += self.direction.x * self.speed * dt
@@ -85,12 +85,12 @@ class Enemy(pygame.sprite.Sprite):
 
         # Movement attributes
         self.direction = pygame.math.Vector2()  # Direction vector
-        self.speed = 200  # Movement speed
+        self.speed = ENEMY_SPEED  # Movement speed
         self.collision_sprites = collision_sprites  # Collision sprites
 
         # Timer
         self.death_time = 0
-        self.death_duration = 400
+        self.death_duration = ENEMY_DEATH_DURATION
 
     def animate(self, dt):
         # Update the frame index for animation

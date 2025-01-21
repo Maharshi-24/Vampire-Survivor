@@ -23,14 +23,13 @@ class Game:
         self.bullet_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
 
-        # Gun timer
+        # Timers
         self.can_shoot = True
         self.shoot_time = 0
-        self.gun_cool_down = 100
 
         # Enemy timer
         self.enemy_event = pygame.event.custom_type()
-        pygame.time.set_timer(self.enemy_event, 300)
+        pygame.time.set_timer(self.enemy_event, ENEMY_SPAWN_INTERVAL)
         self.spawn_positions = []
 
         # Player health
@@ -40,12 +39,13 @@ class Game:
         self.low_health_pulse_alpha = 0
 
         # Audio
-        self.shoot_sound = pygame.mixer.Sound(join('..', 'audio', 'shoot.wav'))
-        self.shoot_sound.set_volume(0.4)
-        self.impact_sound = pygame.mixer.Sound(join('..', 'audio', 'impact.ogg'))
-        self.music = pygame.mixer.Sound(join('..', 'audio', 'music.wav'))
-        # self.music.set_volume(0.3)
-        # self.music.play(-1)
+        self.shoot_sound = pygame.mixer.Sound(AUDIO_PATHS['shoot'])
+        self.shoot_sound.set_volume(AUDIO_VOLUME)
+        self.impact_sound = pygame.mixer.Sound(AUDIO_PATHS['impact'])
+        self.impact_sound.set_volume(IMPACT_VOLUME)
+        self.music = pygame.mixer.Sound(AUDIO_PATHS['music'])
+        self.music.set_volume(MUSIC_VOLUME)
+        self.music.play(-1)
 
         # Setup
         self.load_images()
@@ -53,13 +53,13 @@ class Game:
 
     def load_images(self):
         # Load bullet image
-        self.bullet_surf = pygame.image.load(join('..', 'images', 'gun', 'bullet.png')).convert_alpha()
+        self.bullet_surf = pygame.image.load(IMAGE_PATHS['bullet']).convert_alpha()
         scale_factor = 0.6
         self.bullet_surf = pygame.transform.scale(self.bullet_surf, (int(self.bullet_surf.get_width() * scale_factor), int(self.bullet_surf.get_height() * scale_factor)))
 
         # Load enemy frames
         self.enemy_frames = {}
-        enemies_folder = join('..', 'images', 'enemies')
+        enemies_folder = IMAGE_PATHS['enemies']
         if not exists(enemies_folder):
             raise FileNotFoundError(f"Enemies folder not found: {enemies_folder}")
 
@@ -73,7 +73,7 @@ class Game:
                     self.enemy_frames[enemy_type].append(surf)
 
     def setup(self):
-        map = load_pygame(join('..', 'data', 'maps', 'world.tmx'))
+        map = load_pygame(MAP_PATHS['world'])
 
         for x, y, image in map.get_layer_by_name('Ground').tiles():
             Sprite((x * TILE_SIZE, y * TILE_SIZE), image, self.all_sprites)
@@ -111,7 +111,7 @@ class Game:
     def gun_timer(self):
         if not self.can_shoot:
             current_time = pygame.time.get_ticks()
-            if current_time - self.shoot_time >= self.gun_cool_down:
+            if current_time - self.shoot_time >= GUN_COOLDOWN:  # Use GUN_COOLDOWN from settings
                 self.can_shoot = True
 
     def bullet_collision(self):
