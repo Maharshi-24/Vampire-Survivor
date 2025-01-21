@@ -72,22 +72,19 @@
   <object id="42" name="Enemy" x="2460" y="1554.67">
    <point/>
   </object>
-  <object id="43" name="Enemy" x="2092" y="1152">
-   <point/>
-  </object>
   <object id="44" name="Enemy" x="1230.67" y="758.667">
    <point/>
   </object>
   <object id="45" name="Enemy" x="1032" y="626.667">
    <point/>
   </object>
-  <object id="46" name="Enemy" x="781.333" y="917.333">
+  <object id="46" name="Enemy" x="717.697" y="1047.64">
    <point/>
   </object>
-  <object id="47" name="Enemy" x="953.333" y="752">
+  <object id="47" name="Enemy" x="862.424" y="864.121">
    <point/>
   </object>
-  <object id="48" name="Enemy" x="730.667" y="1146.67">
+  <object id="48" name="Enemy" x="703.394" y="1313.34">
    <point/>
   </object>
   <object id="49" name="Enemy" x="694.667" y="1648">
@@ -99,28 +96,16 @@
   <object id="51" name="Enemy" x="929.333" y="1880">
    <point/>
   </object>
-  <object id="52" name="Enemy" x="1068" y="2208">
-   <point/>
-  </object>
   <object id="53" name="Enemy" x="1380" y="2582.67">
    <point/>
   </object>
   <object id="54" name="Enemy" x="1996" y="2478.67">
    <point/>
   </object>
-  <object id="55" name="Enemy" x="1796" y="2181.33">
-   <point/>
-  </object>
   <object id="56" name="Enemy" x="2266.67" y="2376">
    <point/>
   </object>
-  <object id="57" name="Enemy" x="2198.67" y="2102.67">
-   <point/>
-  </object>
-  <object id="58" name="Enemy" x="2557.33" y="2090.67">
-   <point/>
-  </object>
-  <object id="59" name="Enemy" x="2261.33" y="1829.33">
+  <object id="58" name="Enemy" x="2648.24" y="1866.43">
    <point/>
   </object>
   <object id="60" name="Enemy" x="2630.67" y="1706.67">
@@ -132,7 +117,7 @@
   <object id="62" name="Enemy" x="684" y="2410.67">
    <point/>
   </object>
-  <object id="63" name="Enemy" x="789.333" y="2602.67">
+  <object id="63" name="Enemy" x="910.545" y="2587.52">
    <point/>
   </object>
   <object id="64" name="Enemy" x="1752" y="2620">
@@ -141,28 +126,10 @@
   <object id="65" name="Enemy" x="2104" y="2369.33">
    <point/>
   </object>
-  <object id="66" name="Enemy" x="2570.67" y="2196">
+  <object id="66" name="Enemy" x="2570.67" y="2250.55">
    <point/>
   </object>
   <object id="67" name="Enemy" x="2432" y="1688">
-   <point/>
-  </object>
-  <object id="68" name="Enemy" x="1986.67" y="1429.33">
-   <point/>
-  </object>
-  <object id="69" name="Enemy" x="1064" y="1513.33">
-   <point/>
-  </object>
-  <object id="70" name="Enemy" x="1272" y="2018.67">
-   <point/>
-  </object>
-  <object id="71" name="Enemy" x="1618.67" y="1912">
-   <point/>
-  </object>
-  <object id="72" name="Enemy" x="1473.33" y="1220">
-   <point/>
-  </object>
-  <object id="73" name="Enemy" x="1140" y="1122.67">
    <point/>
   </object>
  </objectgroup>

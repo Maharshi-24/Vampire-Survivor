@@ -26,7 +26,7 @@ class Game:
         #gun timer
         self.can_shoot = True
         self.shoot_time = 0
-        self.gun_cool_down = 100
+        self.gun_cool_down = 500
 
         #enemy timer
         self.enemy_event = pygame.event.custom_type()
@@ -37,8 +37,9 @@ class Game:
         self.shoot_sound = pygame.mixer.Sound(join('..', 'audio', 'shoot.wav'))
         self.shoot_sound.set_volume(0.4)
         self.impact_sound = pygame.mixer.Sound(join('..', 'audio', 'impact.ogg'))
+        self.impact_sound.set_volume(0.1)
         self.music = pygame.mixer.Sound(join('..', 'audio', 'music.wav'))
-        self.music.set_volume(0.3)
+        self.music.set_volume(0.1)
         self.music.play(-1)
 
         #setup 
