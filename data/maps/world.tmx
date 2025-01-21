@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="52" height="50" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="175">
+<map version="1.10" tiledversion="1.11.1" orientation="orthogonal" renderorder="right-down" width="52" height="50" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="176">
  <tileset firstgid="1" source="../tilesets/world_tileset.tsx"/>
  <tileset firstgid="211" source="../tilesets/Objects.tsx"/>
  <layer id="1" name="Ground" width="52" height="50">
@@ -150,19 +150,19 @@
   <object id="68" name="Enemy" x="1986.67" y="1429.33">
    <point/>
   </object>
-  <object id="69" x="1064" y="1513.33">
+  <object id="69" name="Enemy" x="1064" y="1513.33">
    <point/>
   </object>
-  <object id="70" x="1272" y="2018.67">
+  <object id="70" name="Enemy" x="1272" y="2018.67">
    <point/>
   </object>
-  <object id="71" x="1618.67" y="1912">
+  <object id="71" name="Enemy" x="1618.67" y="1912">
    <point/>
   </object>
-  <object id="72" x="1473.33" y="1220">
+  <object id="72" name="Enemy" x="1473.33" y="1220">
    <point/>
   </object>
-  <object id="73" x="1140" y="1122.67">
+  <object id="73" name="Enemy" x="1140" y="1122.67">
    <point/>
   </object>
  </objectgroup>
@@ -191,9 +191,9 @@
   <object id="95" x="1412" y="500" width="234.667" height="138.667"/>
   <object id="96" x="1217.33" y="433.333" width="305.333" height="150.667"/>
   <object id="97" x="833.333" y="402.667" width="538.667" height="110.667"/>
-  <object id="98" x="433.333" y="401.333" width="486.667" height="161.333"/>
-  <object id="99" x="336" y="416" width="242.667" height="529.333"/>
-  <object id="100" x="521.333" y="857.333" width="118.667" height="506.667"/>
+  <object id="98" x="433.333" y="505.333" width="486.667" height="57.333"/>
+  <object id="99" x="510.667" y="450.667" width="68.0003" height="455.333"/>
+  <object id="100" x="521.333" y="900.666" width="114" height="463.334"/>
   <object id="101" x="380" y="1274.67" width="185.333" height="1076"/>
   <object id="157" x="1744" y="1606" width="178" height="249"/>
   <object id="158" x="1808" y="1543" width="172" height="177"/>
