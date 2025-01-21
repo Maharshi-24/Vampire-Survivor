@@ -18,6 +18,9 @@ HEALTH_BAR_BORDER_WIDTH = 3  # Border thickness
 MAX_HEALTH = 10  # Player can take 10 hits
 
 # Animation Settings
+LOW_HEALTH_OVERLAY_SPEED = 0.02  # Speed of the low-health overlay pulse
+
+# Animation Settings
 DAMAGE_FLASH_DURATION = 100  # Duration of the red flash in milliseconds (very short)
 HEALTH_BAR_SHAKE_DURATION = 100  # Duration of the shake effect in milliseconds (very short)
 LOW_HEALTH_THRESHOLD = 3  # Health threshold for low health effects

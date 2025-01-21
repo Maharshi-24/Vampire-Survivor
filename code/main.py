@@ -162,13 +162,19 @@ class Game:
             self.display_surface.blit(self.display_surface, (shake_offset, 0))
             self.health_bar_shake_timer -= 1
 
-        # Low health pulse effect
+    def draw_low_health_overlay(self):
         if self.player_health <= LOW_HEALTH_THRESHOLD:
-            self.low_health_pulse_alpha += LOW_HEALTH_PULSE_SPEED
+            # Calculate the alpha value for the overlay using a sine wave
+            self.low_health_pulse_alpha += LOW_HEALTH_OVERLAY_SPEED
             pulse_alpha = int((1 + math.sin(self.low_health_pulse_alpha)) * 127.5 + 127.5)
-            pulse_surface = pygame.Surface((HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT), pygame.SRCALPHA)
-            pulse_surface.fill((255, 0, 0, pulse_alpha))
-            self.display_surface.blit(pulse_surface, HEALTH_BAR_POS)
+            
+            # Clamp pulse_alpha to the valid range [0, 255]
+            pulse_alpha = max(0, min(255, pulse_alpha))
+            
+            # Create a translucent red overlay
+            overlay_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+            overlay_surface.fill((255, 0, 0, pulse_alpha))
+            self.display_surface.blit(overlay_surface, (0, 0))
 
     def take_damage(self):
         if self.player_health > 0:

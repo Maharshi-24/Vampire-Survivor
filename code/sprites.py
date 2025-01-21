@@ -85,10 +85,10 @@ class Enemy(pygame.sprite.Sprite):
 
         # Movement attributes
         self.direction = pygame.math.Vector2()  # Direction vector
-        self.speed = 100  # Movement speed
+        self.speed = 200  # Movement speed
         self.collision_sprites = collision_sprites  # Collision sprites
 
-        #timer
+        # Timer
         self.death_time = 0
         self.death_duration = 400
 
@@ -105,7 +105,13 @@ class Enemy(pygame.sprite.Sprite):
         # Calculate direction towards the player
         player_pos = pygame.Vector2(self.player.rect.center)
         enemy_pos = pygame.Vector2(self.rect.center)
-        self.direction = (player_pos - enemy_pos).normalize()
+        direction = player_pos - enemy_pos
+
+        # Only normalize if the direction vector has a non-zero length
+        if direction.length() > 0:
+            self.direction = direction.normalize()
+        else:
+            self.direction = pygame.Vector2(0, 0)  # Stop moving if the player and enemy are at the same position
 
         # Update the hitbox position
         self.hitbox_rect.x += self.direction.x * self.speed * dt
@@ -128,20 +134,20 @@ class Enemy(pygame.sprite.Sprite):
                         self.hitbox_rect.bottom = sprite.rect.top
                     if self.direction.y < 0:  # Moving up
                         self.hitbox_rect.top = sprite.rect.bottom
-                    
+
     def destroy(self):
-        # start a timer
+        # Start a timer
         self.death_time = pygame.time.get_ticks()
-        # change the image
+        # Change the image
         surf = pygame.mask.from_surface(self.frames[0]).to_surface()
         surf.set_colorkey('black')
         self.image = surf
 
     def death_timer(self):
-        # check if the timer is over
+        # Check if the timer is over
         if pygame.time.get_ticks() - self.death_time >= self.death_duration:
             self.kill()
-    
+
     def update(self, dt):
         # Update the enemy's state
         if self.death_time == 0:
