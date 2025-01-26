@@ -7,6 +7,7 @@ from pytmx.util_pygame import load_pygame
 from groups import AllSprites
 from random import randint, choice
 import math
+from game_over import GameOverMenu  # Import the new GameOverMenu class
 
 class Game:
     def __init__(self):
@@ -16,6 +17,7 @@ class Game:
         pygame.display.set_caption('Survivor Shooter')
         self.clock = pygame.time.Clock()
         self.running = True
+        self.game_over = False  # Add game over state
 
         # Groups
         self.all_sprites = AllSprites()
@@ -111,7 +113,7 @@ class Game:
     def gun_timer(self):
         if not self.can_shoot:
             current_time = pygame.time.get_ticks()
-            if current_time - self.shoot_time >= GUN_COOLDOWN:  # Use GUN_COOLDOWN from settings
+            if current_time - self.shoot_time >= GUN_COOLDOWN:
                 self.can_shoot = True
 
     def bullet_collision(self):
@@ -122,7 +124,7 @@ class Game:
                 if collision_sprites:
                     self.impact_sound.play()
                     for sprite in collision_sprites:
-                        if hasattr(sprite, 'destroy'):  # Check if the sprite has a destroy method
+                        if hasattr(sprite, 'destroy'):
                             sprite.destroy()
                     bullet.kill()
 
@@ -131,14 +133,14 @@ class Game:
                 if enemy_collisions:
                     self.impact_sound.play()
                     for enemy in enemy_collisions:
-                        if hasattr(enemy, 'destroy'):  # Check if the enemy has a destroy method
+                        if hasattr(enemy, 'destroy'):
                             enemy.destroy()
                     bullet.kill()
 
     def player_collision(self):
         if pygame.sprite.spritecollide(self.player, self.enemy_sprites, False, pygame.sprite.collide_mask):
-            if self.player.take_damage():  # If damage is taken
-                self.take_damage()  # Reduce health
+            if self.player.take_damage():
+                self.take_damage()
 
     def draw_health_bar(self):
         # Calculate health bar width based on current health
@@ -171,20 +173,33 @@ class Game:
             # Clamp pulse_alpha to the valid range [0, 255]
             pulse_alpha = max(0, min(255, pulse_alpha))
             
+            # Reduce the alpha value to make the overlay more translucent
+            pulse_alpha = int(pulse_alpha * 0.5)  # Adjust the multiplier (0.5 makes it 50% of the original alpha)
+            
             # Create a translucent red overlay
             overlay_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
-            overlay_surface.fill((255, 0, 0, pulse_alpha))
+            overlay_surface.fill((255, 0, 0, pulse_alpha))  # Red color with adjustable alpha
             self.display_surface.blit(overlay_surface, (0, 0))
 
     def take_damage(self):
         if self.player_health > 0:
-            self.player_health -= 1  # Reduce health by 1 hit
-            self.health_bar_shake_timer = HEALTH_BAR_SHAKE_DURATION  # Start shake effect
-            self.damage_flash_timer = DAMAGE_FLASH_DURATION  # Start damage flash effect
+            self.player_health -= 1
+            self.health_bar_shake_timer = HEALTH_BAR_SHAKE_DURATION
+            self.damage_flash_timer = DAMAGE_FLASH_DURATION
 
             # Check if player is dead
             if self.player_health <= 0:
-                self.running = False  # End the game
+                self.game_over = True  # Trigger game over state
+
+    def reset_game(self):
+        # Reset the game state
+        self.game_over = False
+        self.player_health = MAX_HEALTH
+        self.all_sprites.empty()
+        self.collision_sprites.empty()
+        self.bullet_sprites.empty()
+        self.enemy_sprites.empty()
+        self.setup()
 
     def run(self):
         while self.running:
@@ -194,20 +209,28 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                if event.type == self.enemy_event:
+                if event.type == self.enemy_event and not self.game_over:
                     Enemy(choice(self.spawn_positions), choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites),
 
             # Update
-            self.gun_timer()
-            self.input()
-            self.all_sprites.update(dt)
-            self.bullet_collision()
-            self.player_collision()
+            if not self.game_over:
+                self.gun_timer()
+                self.input()
+                self.all_sprites.update(dt)
+                self.bullet_collision()
+                self.player_collision()
 
             # Draw
             self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
-            self.draw_health_bar()  # Draw the health bar
+            self.draw_health_bar()
+            self.draw_low_health_overlay()
+
+            # Show game over menu if the game is over
+            if self.game_over:
+                game_over_menu = GameOverMenu(self)
+                game_over_menu.update()
+
             pygame.display.update()
 
         pygame.quit()
