@@ -69,3 +69,38 @@ AUDIO_PATHS = {
 MAP_PATHS = {
     'world': join('..', 'data', 'maps', 'world.tmx'),
 }
+
+# Leveling System
+BASE_XP_REQUIREMENT = 100
+XP_SCALING_FACTOR = 1.5
+MAX_LEVEL = 50
+
+# Player Stats
+BASE_PLAYER_DAMAGE = 10
+BASE_PLAYER_SPEED = 500
+BASE_PLAYER_HEALTH = 10
+
+# Stat Growth Per Level
+HEALTH_GROWTH = 2
+DAMAGE_GROWTH = 1
+SPEED_GROWTH = 10
+
+# Power-up Settings
+POWERUP_DURATION = 10000  # 10 seconds
+POWERUP_SPAWN_CHANCE = 0.1  # 10% chance to spawn on enemy death
+
+# Achievement Settings
+ACHIEVEMENTS = {
+    'first_blood': {'name': 'First Blood', 'description': 'Kill your first enemy', 'xp_reward': 50},
+    'survivor': {'name': 'Survivor', 'description': 'Survive for 5 minutes', 'xp_reward': 100},
+    'marksman': {'name': 'Marksman', 'description': 'Kill 100 enemies', 'xp_reward': 200},
+    'speed_demon': {'name': 'Speed Demon', 'description': 'Reach level 10', 'xp_reward': 300},
+}
+
+# UI Colors
+UI_COLORS = {
+    'xp_bar': (0, 255, 0),
+    'level_text': (255, 255, 0),
+    'powerup_active': (255, 165, 0),
+    'achievement': (255, 215, 0),
+}
